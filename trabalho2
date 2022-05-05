@@ -1,0 +1,115 @@
+/*
+1- Selecione todos os códigos, nomes e sobrenomes dos
+funcionários, que tem salário nas faixas de 0 a
+ 2000 e maiores ou iguais a 5000. */
+ select * from hr.jobs;
+ 
+ select EMPLOYEE_ID,FIRST_NAME,	LAST_NAME, salary from hr.employees where salary <=2000 or salary >=5000 order by salary asc ;
+ 
+ /*
+ 2. Selecione os o nome do funcionário (nome completo) e
+os nomes dos departamentos dos funcionários que recebem
+salários entre 1750,99 e 2000.*/
+
+select FIRST_NAME, LAST_NAME, DEPARTMENT_NAME, salary 
+ from hr.employees emp inner  join hr.departments dep 
+ on emp.DEPARTMENT_ID = dep.DEPARTMENT_ID
+WHERE EMP.SALARY >= 1750.99	   or  emp.SALARY <= 2000;  
+
+/* 3. Selecione o código, o nome do funcionário, a data de
+admissão (hire date), a data de início e fim
+de determinado cargo (jobs). Um funcionário pode
+ter trabalhado em mais de um cargo em um período de tempo,
+a tabela JOB_HISTORY tem a função de guardar
+essas trocas.*/
+	-- NÃO CONSEGUI ENTENDER 
+
+
+
+SELECT  EMP.EMPLOYEE_ID,
+		FIRST_NAME,
+        JJ.JOB_TITLE CARGO_ATUAL,
+        TO_CHAR(HIRE_DATE,'DD/MM/YYYY') AS HIRE_DATE,
+        J.JOB_TITLE AS CARGO_TROCA,
+        TO_CHAR(START_DATE,'DD/MM/YYYY') AS DATA_INICIO,
+        TO_CHAR(END_DATE,'DD/MM/YYYY') AS DATA_FIM
+ FROM hr.EMPLOYEES EMP
+ INNER JOIN hr.JOB_HISTORY JH
+ ON EMP.EMPLOYEE_ID = JH.EMPLOYEE_ID
+ INNER JOIN hr.JOBS J
+ ON JH.JOB_ID = J.JOB_ID
+ INNER JOIN hr.JOBS JJ
+ ON EMP.JOB_ID = JJ.JOB_ID
+ ORDER BY EMP.EMPLOYEE_ID ASC, START_DATE DESC;
+
+/*4. Selecione o nome da região, o nome do país, onde os nomes de países
+iniciem com as letras A e J.*/
+
+select* from hr.regions;
+select* from hr.countries;
+
+select REGION_NAME, COUNTRY_NAME from hr.regions reg right join hr.countries cou on reg.REGION_ID = cou.REGION_ID
+where COUNTRY_NAME LIKE 'A%' OR COUNTRY_NAME LIKE 'J%';
+
+/* 5.Fazer uma pesquisa que retorne os departamentos ordenados pela quantidade de funcionários (do que
+tem mais funcionários para o que tem menos funcionários).*/
+
+select * from hr.departments;
+select * from hr.employees;
+
+select DEPARTMENT_NAME, COUNT(EMPLOYEE_ID) as TOTAL_FUNC from hr.departments dep left join hr.employees emp on dep.DEPARTMENT_ID = emp.DEPARTMENT_ID GROUP BY DEPARTMENT_NAME
+ORDER BY COUNT(EMPLOYEE_ID) DESC;
+
+/* 6.Fazer uma pesquisa que retorne os departamentos ordenados pela quantidade de funcionários (do que
+tem mais funcionários para o que tem menos funcionários). Eliminar deste resultado os departamentos
+que apresentem 1 ou nenhum funcionário.).*/
+
+
+select DEPARTMENT_NAME, COUNT(EMPLOYEE_ID) as TOTAL_FUNC from hr.departments dep left join hr.employees emp on dep.DEPARTMENT_ID = emp.DEPARTMENT_ID  
+GROUP BY DEPARTMENT_NAME  having  COUNT(EMPLOYEE_ID) >1 ORDER BY COUNT(EMPLOYEE_ID) DESC;
+
+/* 7.Criar uma lista com todos os aniversariantes de empresa  mês de novembro, nesta listagem deve ser
+retornado o primeiro nome e o último nome do funcionário,  departamento ao qual está alocado, 
+ a cidade, o estado e o país de sua sede,  o dia do aniversário e quantos anos o 
+ funcionário está fazendo de empresa..*/
+
+select  first_name, last_name,  department_name, city, state_province, country_name,TO_CHAR(HIRE_DATE, 'DD') as DAY, TO_CHAR(SYSDATE,'YYYY')-TO_CHAR(HIRE_DATE,'YYYY') AS years
+from hr.employees emp left join hr.departments dep on emp.department_id = dep.department_id
+left  join hr.locations loc on loc.location_id = dep.location_id 
+left join hr.countries cou on cou.country_id = loc.country_id
+WHERE TO_CHAR(HIRE_DATE, 'MM') = 11
+ORDER BY TO_CHAR(HIRE_DATE,'DD/MM') ASC;
+
+/* 8. Criar uma listagem com os nomes dos departamentos  que não tem funcionários alocados. Esta listagem 
+ deve conter apenas os nomes dos departamentos.*/
+
+select department_name from hr.departments dep left join hr.employees emp on dep.department_id = emp.department_id group by department_name having count(employee_id) =0 ;
+
+
+/* 9. Mostre todos os funcionários que foram contratados após o ano de 1995, nesta listagem deve aparecer o nome do 
+funcionário e o ano de contratação.
+*/
+
+select first_name, to_char(hire_date, 'YYYY') as contratation_year from hr.employees where to_char(hire_date, 'YYYY') > 1995;
+
+
+/* 10. Listar o nome do funcionário e seu cargo, relacionar apenas os funcionários que não tem definido valor de comissão. 
+Lembrando que 0 (zero) é valor */
+
+select first_name, job_title from hr.employees emp  inner join hr.jobs job on emp.job_id = job.job_id where COMMISSION_PCT is NULL;
+
+
+/* 11. Quantos funcionários tem nomes terminados na letra y.*/
+
+select first_name from hr.employees where first_name like '%y';
+
+
+/* 12. Crie uma listagemm de cargos, que contenha a quantidade de funcionários, o maior salário para o cargo, o
+menor salário para o cargo e a média de salário. Elimine desta listagem o departamento de código 90. 
+E só mostre os cargos com média salarial acima de 10000.*/
+
+SELECT JOB_TITLE, count (salary), max(SALARY) as max_salary, min(SALARY) as min_salary, avg(SALARY) as media_salary FROM HR.EMPLOYEES emp INNER JOIN HR.JOBS job
+ON emp.JOB_ID = job.JOB_ID
+WHERE EMPLOYEE_ID <> 90
+GROUP BY JOB_TITLE
+having avg(SALARY) >10000;
