@@ -1,0 +1,47 @@
+
+a.(2,0) Descreva  o  script  de  criação  do  modelo  de  dados  apresentado (todas as tabelas e regras envolvidas).
+create table curso (
+cod_curso number(3) primary key,
+nome varchar2(120) not null
+);
+create table aluno (
+ra number primary key,
+nome varchar2(120) not null,
+sexo char(1) not null,
+cod_curso number(3) not null,
+constraint fk_curso_aluno foreign key (cod_curso) references curso (cod_curso)
+);
+
+create table mensalidade (
+ra number,
+anomes char(6),
+data_vencimento date not null,
+valor number (8,2),
+desconto number(8,2) not null,
+data_pagamento date,
+constraint pk_mensalidade primary key (anomes,ra)
+);
+
+b.(1,0) Insira o curso de código igual a 55, com o nome Biologia.
+insert into curso (cod_curso, nome) values (55,'Biologia');
+commit;
+c.(1,0) Crie uma sequência (sequence) para controlar os RAs databela de ALUNO. Deve iniciar com o código 18100, deve ser incrementada de 100em 100, não deve ser cíclicae ne deve permitir cache.Lembrar de definir o tamanho máximo de códigos que devem ser gerados.
+create sequence seq_aluno
+start with 18100
+increment by 100
+maxvalue 9999999999
+nocache
+nocycle
+order;
+
+d.(2,0) Insira o aluno Mario Souza, do sexo masculino, que faz o curso Biologia.
+insert into aluno (ra,nome, sexo,cod_curso) values (seq_aluno.nextval, 'Mario Souza', 'm', 55);
+commit;
+
+e.(2,0) Apague os alunos de sexo masculinoque fazem o curso Biologiaque tem o código de curso igual a 55.
+delete from aluno where sexo = 'm' and cod_curso=55;
+commit;
+
+f.(2,0) Altere o nome do aluno Mario Souzapara Paulo Silva.
+insert into aluno (ra,nome, sexo,cod_curso) values (seq_aluno.nextval, 'Paulo Silva', 'm', 55);
+commit;
